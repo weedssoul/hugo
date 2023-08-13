@@ -670,3 +670,27 @@ func TestConvertCJKPunctuation(t *testing.T) {
 
 	c.Assert(got, qt.Contains, "<p>あいうえお、かきくけこ</p>\n")
 }
+
+func TestConvertCJKWithoutExtension(t *testing.T) {
+	c := qt.New(t)
+
+	content := `
+あいうえお
+かきくけこ
+`
+
+	confStr := `
+[markup]
+[markup.goldmark]
+[markup.goldmark.extensions]
+CJK=false
+`
+
+	cfg := config.FromTOMLConfigString(confStr)
+	conf := testconfig.GetTestConfig(nil, cfg)
+
+	b := convert(c, conf, content)
+	got := string(b.Bytes())
+
+	c.Assert(got, qt.Contains, "<p>あいうえお\nかきくけこ</p>\n")
+}
