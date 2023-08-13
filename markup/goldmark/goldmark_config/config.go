@@ -43,7 +43,7 @@ var Default = Config{
 		Linkify:         true,
 		LinkifyProtocol: "https",
 		TaskList:        true,
-		CJK:             true,
+		CJK:             false,
 	},
 	Renderer: Renderer{
 		Unsafe: false,
