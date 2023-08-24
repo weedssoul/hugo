@@ -626,3 +626,75 @@ unsafe = false
 	return testconfig.GetTestConfig(nil, cfg)
 
 }
+
+func TestConvertCJK(t *testing.T) {
+	c := qt.New(t)
+
+	content := `
+あいうえお
+かきくけこ\ さしすせそ
+`
+
+	confStr := `
+[markup]
+[markup.goldmark]
+`
+
+	cfg := config.FromTOMLConfigString(confStr)
+	conf := testconfig.GetTestConfig(nil, cfg)
+
+	b := convert(c, conf, content)
+	got := string(b.Bytes())
+
+	c.Assert(got, qt.Contains, "<p>あいうえお\nかきくけこ\\ さしすせそ</p>\n")
+}
+
+func TestConvertCJKWithExtensionWithEastAsianLineBreaksOption(t *testing.T) {
+	c := qt.New(t)
+
+	content := `
+あいうえお
+かきくけこ
+`
+
+	confStr := `
+[markup]
+[markup.goldmark]
+[markup.goldmark.extensions.CJK]
+enable=true
+eastAsianLineBreaks=true
+`
+
+	cfg := config.FromTOMLConfigString(confStr)
+	conf := testconfig.GetTestConfig(nil, cfg)
+
+	b := convert(c, conf, content)
+	got := string(b.Bytes())
+
+	c.Assert(got, qt.Contains, "<p>あいうえおかきくけこ\\ さしすせそ</p>\n")
+}
+
+func TestConvertCJKWithExtensionWithEscapedSpaceOption(t *testing.T) {
+	c := qt.New(t)
+
+	content := `
+あいうえお
+かきくけこ\ さしすせそ
+`
+
+	confStr := `
+[markup]
+[markup.goldmark]
+[markup.goldmark.extensions.CJK]
+enable=true
+escapedSpace=true
+`
+
+	cfg := config.FromTOMLConfigString(confStr)
+	conf := testconfig.GetTestConfig(nil, cfg)
+
+	b := convert(c, conf, content)
+	got := string(b.Bytes())
+
+	c.Assert(got, qt.Contains, "<p>あいうえお\nかきくけこさしすせそ</p>\n")
+}
